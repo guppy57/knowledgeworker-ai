@@ -1,0 +1,2 @@
+-i https://pypi.org/simple
+pytube==15.0.0; python_version >= '3.7'
