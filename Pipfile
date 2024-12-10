@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 pytube = "*"
+pytubefix = "*"
 
 [dev-packages]
 

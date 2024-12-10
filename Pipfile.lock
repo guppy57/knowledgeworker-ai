@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "530c9e8cdfa9dcd4dac0a36d2309719c4ba7d3a2733a50431021275e47842d68"
+            "sha256": "8c90840c97682106de8c1454a3ea8b7f9935e1d9626be27dbdbd5eaaeb7e9a81"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -24,6 +24,15 @@
             "index": "pypi",
             "markers": "python_version >= '3.7'",
             "version": "==15.0.0"
+        },
+        "pytubefix": {
+            "hashes": [
+                "sha256:52d72f630169da3dc9db52e960a6b948d0bdae4387a93c8314c5c1a311f6c735",
+                "sha256:df0fd990a25ef130738c18cdf3756ce8699b69a74e52db8c18acd2ba2225f706"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.7'",
+            "version": "==8.2.0"
         }
     },
     "develop": {}

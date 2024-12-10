@@ -1,2 +1,3 @@
 -i https://pypi.org/simple
 pytube==15.0.0; python_version >= '3.7'
+pytubefix==8.2.0; python_version >= '3.7'
