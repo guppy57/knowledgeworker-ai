@@ -2,8 +2,9 @@ import os
 import ffmpeg
 from pytubefix import YouTube
 
-SAVE_PATH = "/Users/guppythegod/Desktop/knowledgeworker-ai-downloads"
+SAVE_PATH = "/Users/guppy57/Downloads/knowledgeworker-ai-downloads"
 LINK = "https://www.youtube.com/watch?v=xWOoBJUqlbI"
+
 
 def get_video_info(yt) -> dict:
     return {
@@ -16,8 +17,9 @@ def get_video_info(yt) -> dict:
         "keywords": yt.keywords,
         "rating": yt.rating,
         "author": yt.author,
-        "channel_url": yt.channel_url
+        "channel_url": yt.channel_url,
     }
+
 
 def download_video_as_mp4(yt):
     # Get all streams and filter for mp4 files
@@ -32,8 +34,10 @@ def download_video_as_mp4(yt):
         # Download the video
         d_video.download(output_path=SAVE_PATH)
         print("Video downloaded successfully!")
-    except:
+    except Exception as e:
+        print(e)
         print("Some Error!")
+
 
 def convert_to_audio(title):
     # Get the video file
@@ -43,11 +47,11 @@ def convert_to_audio(title):
     try:
         # Convert to audio using ffmpeg-python
         stream = ffmpeg.input(video_file)
-        stream = ffmpeg.output(stream, output_file, acodec='libmp3lame', q='2', vn=None)
+        stream = ffmpeg.output(stream, output_file, acodec="libmp3lame", q="2", vn=None)
         ffmpeg.run(stream, overwrite_output=True)
         print("Audio converted successfully!")
     except ffmpeg.Error as e:
-        print(f"An error occurred: {e.stderr.decode()}")
+        print(f"An error occurred: {e}")
 
 
 def main():
@@ -62,9 +66,10 @@ def main():
     video_info = get_video_info(yt)
     print(video_info)
     download_video_as_mp4(yt)
-    convert_to_audio(video_info["title"])
+    # convert_to_audio(video_info["title"])
 
     print("Task Completed!")
+
 
 if __name__ == "__main__":
     main()
