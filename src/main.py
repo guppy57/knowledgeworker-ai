@@ -4,6 +4,8 @@ from openai import OpenAI
 from deepgram import DeepgramClient, PrerecordedOptions
 from pytubefix import YouTube
 
+from prompts import get_main_summary_prompt
+
 LINK = "https://www.youtube.com/watch?v=u20SkTIZuNk&list=WL&index=1"
 
 deepgram = DeepgramClient(os.getenv("DEEPGRAM_API_KEY"))
@@ -59,16 +61,20 @@ def transcribe_audio(file_path):
 
 
 def summarize_text(transcript):
+    prompt = get_main_summary_prompt(transcript)
     response = gpt.chat.completions.create(
         messages=[
             {
                 "role": "user",
-                "content": f"Summarize the following transcript: {transcript}",
+                "content": prompt,
             }
         ],
         model="gpt-4o",
     )
+
     print(response)
+
+    return response.choices[0].message.content
 
 
 def main():
