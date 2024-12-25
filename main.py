@@ -1,9 +1,13 @@
 import os
-import ffmpeg
+import httpx
+from openai import OpenAI
+from deepgram import DeepgramClient, PrerecordedOptions
 from pytubefix import YouTube
 
-SAVE_PATH = "/Users/guppy57/Downloads/knowledgeworker-ai-downloads"
-LINK = "https://www.youtube.com/watch?v=xWOoBJUqlbI"
+LINK = "https://www.youtube.com/watch?v=u20SkTIZuNk&list=WL&index=1"
+
+deepgram = DeepgramClient(os.getenv("DEEPGRAM_API_KEY"))
+gpt = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
 
 
 def get_video_info(yt) -> dict:
@@ -22,51 +26,66 @@ def get_video_info(yt) -> dict:
 
 
 def download_video_as_mp4(yt):
-    # Get all streams and filter for mp4 files
+    save_path = "/Users/guppy57/Downloads/knowledgeworker-ai-downloads"
     mp4_streams = yt.streams.filter(file_extension="mp4")
-
-    # Get the video with the highest resolution
     d_video = mp4_streams[-1]
 
-    print(d_video)
-
     try:
-        # Download the video
-        d_video.download(output_path=SAVE_PATH)
-        print("Video downloaded successfully!")
+        d_video.download(output_path=save_path)
     except Exception as e:
         print(e)
         print("Some Error!")
 
+    return f"{save_path}/{yt.title}.m4a"
 
-def convert_to_audio(title):
-    # Get the video file
-    video_file = os.path.join(SAVE_PATH, title + ".mp4")
-    output_file = os.path.join(SAVE_PATH, title + ".mp3")
 
-    try:
-        # Convert to audio using ffmpeg-python
-        stream = ffmpeg.input(video_file)
-        stream = ffmpeg.output(stream, output_file, acodec="libmp3lame", q="2", vn=None)
-        ffmpeg.run(stream, overwrite_output=True)
-        print("Audio converted successfully!")
-    except ffmpeg.Error as e:
-        print(f"An error occurred: {e}")
+def transcribe_audio(file_path):
+    buffer_data = None
+
+    with open(file_path, "rb") as file:
+        buffer_data = file.read()
+
+    payload = {"buffer": buffer_data}
+
+    options = PrerecordedOptions(smart_format=True, punctuate=True)
+
+    response = deepgram.listen.rest.v("1").transcribe_file(
+        payload,
+        options,
+        timeout=httpx.Timeout(300.0, connect=10.0),
+    )
+
+    return response["results"]["channels"][0]["alternatives"][0]["transcript"]
+
+
+def summarize_text(transcript):
+    response = gpt.chat.completions.create(
+        messages=[
+            {
+                "role": "user",
+                "content": f"Summarize the following transcript: {transcript}",
+            }
+        ],
+        model="gpt-4o",
+    )
+    print(response)
 
 
 def main():
     try:
-        # Object creation using YouTube
-        # which was imported in the beginning
         yt = YouTube(LINK)
     except:
         # Handle exception
         print("Connection Error")
 
     video_info = get_video_info(yt)
-    print(video_info)
-    download_video_as_mp4(yt)
-    # convert_to_audio(video_info["title"])
+    file_path = download_video_as_mp4(yt)
+    transcription = transcribe_audio(file_path)
+    summary = summarize_text(transcription)
+
+    print(summary)
+    # create a markdown file based on a template provided for Obsidian
+    # somehow get the file to obsidian or something.
 
     print("Task Completed!")
 
